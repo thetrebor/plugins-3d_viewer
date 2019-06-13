@@ -63,7 +63,8 @@ var App = {
 		}
 	},
 
-	onLoadError: function() {
+	onLoadError: function(er) {
+		console.log(er);
 		alert('failed to load model');
 	},
 
@@ -79,7 +80,7 @@ var App = {
 	loadModel: function() {
 		this.loadingManager = new THREE.LoadingManager();
 		this.loadingManager.onProgress = function (item, loaded, total) {
-			console.log(item, loaded, total);
+			//console.log(item, loaded, total);
 		};
 
 		if (this.vars.fileExtension == 'obj') {
@@ -94,6 +95,10 @@ var App = {
 			this.loadModelDAE();
 		} else if (this.vars.fileExtension == 'x') {
 			this.loadModelX();
+		} else if (this.vars.fileExtension == 'gltf' || this.vars.fileExtension == 'glb') {
+			this.loadModelGLTF();
+		}  else if (this.vars.fileExtension == '3ds') {
+			this.loadModel3DS();
 		} else {
 			alert('This file format cannot be handled.');
 		}
@@ -207,6 +212,34 @@ var App = {
 					App.addObject(model);
 				}
 			},
+			this.onDownloadProgress,
+			this.onLoadError
+		);
+	},
+
+	loadModelGLTF: function() {
+		this.renderer.gammaOutput = true;
+		this.renderer.gammaFactor = 2.2;
+		var loader = new THREE.GLTFLoader(this.loadingManager);
+		THREE.DRACOLoader.setDecoderPath(this.vars.pluginURL+'/three/libs/draco/');
+		loader.setDRACOLoader(new THREE.DRACOLoader());
+		var fileDownloadURL = this.vars.downloadBaseURL+'&path='+encodeURIComponent(this.vars.filePath);
+		loader.setResourcePath(this.vars.downloadBaseURL+'&path='+this.vars.folderPath+'/');
+		loader.load(
+			fileDownloadURL,
+			function(obj) {App.addObject(obj.scene);},
+			this.onDownloadProgress,
+			this.onLoadError
+		);
+	},
+
+	loadModel3DS: function() {
+		var loader = new THREE.TDSLoader(this.loadingManager);
+		var fileDownloadURL = this.vars.downloadBaseURL+'&path='+encodeURIComponent(this.vars.filePath);
+		loader.setResourcePath(this.vars.downloadBaseURL+'&path='+this.vars.folderPath+'/textures/');
+		loader.load(
+			fileDownloadURL,
+			function(obj) {App.addObject(obj);},
 			this.onDownloadProgress,
 			this.onLoadError
 		);

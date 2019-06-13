@@ -10,7 +10,7 @@ class custom_3d_viewer extends \FileRun\Files\Plugin {
 		$this->JSconfig = [
 			"title" => self::t("3D Viewer"),
 			'iconCls' => 'fa fa-fw fa-dice-d6',
-			'extensions' => ['obj', 'fbx', 'mtl', 'stl', 'dae', 'x'],
+			'extensions' => ['obj', 'fbx', 'mtl', 'stl', 'dae', 'x', 'gltf', 'glb', '3ds'],
 			"popup" => true,
 			"requiredUserPerms" => ["download"],
 			'requires' => ['download']

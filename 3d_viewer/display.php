@@ -5,6 +5,7 @@ $fileExtension = \FM::getExtension($fileName);
 
 $vars = [
 	'URLRoot' => $config['url']['root'],
+	'pluginURL' => $this->url,
 	'folderPath' => \FM::dirname($data['relativePath']),
 	'filePath' => $data['relativePath'],
 	'filePathOBJ' => \FM::replaceExtension($data['relativePath'], 'obj'),
@@ -20,7 +21,6 @@ $vars = [
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<title><?php echo \S::safeHTML(\S::forHTML($fileName));?></title>
 	<script src="<?php echo $this->url;?>/three/three.min.js?v=<?php echo $settings->currentVersion;?>"></script>
-
 
 	<?php if ($fileExtension == 'mtl' || $fileExtension == 'obj') { ?>
 	<script src="<?php echo $this->url;?>/three/loaders/OBJLoader.js?v=<?php echo $settings->currentVersion;?>"></script>
@@ -45,6 +45,15 @@ $vars = [
 
 	<?php if ($fileExtension == 'x') { ?>
 	<script src="<?php echo $this->url;?>/three/loaders/XLoader.js?v=<?php echo $settings->currentVersion;?>"></script>
+	<?php } ?>
+
+	<?php if ($fileExtension == 'gltf' || $fileExtension == 'glb') { ?>
+	<script src="<?php echo $this->url;?>/three/loaders/GLTFLoader.js?v=<?php echo $settings->currentVersion;?>"></script>
+	<script src="<?php echo $this->url;?>/three/loaders/DRACOLoader.js?v=<?php echo $settings->currentVersion;?>"></script>
+	<?php } ?>
+
+	<?php if ($fileExtension == '3ds') { ?>
+	<script src="<?php echo $this->url;?>/three/loaders/TDSLoader.js?v=<?php echo $settings->currentVersion;?>"></script>
 	<?php } ?>
 
 	<script src="<?php echo $this->url;?>/three/controls/OrbitControls.js?v=<?php echo $settings->currentVersion;?>"></script>
