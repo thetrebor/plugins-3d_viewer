@@ -43,6 +43,10 @@ $vars = [
 	<script src="<?php echo $this->url;?>/three/loaders/ColladaLoader.js?v=<?php echo $settings->currentVersion;?>"></script>
 	<?php } ?>
 
+	<?php if ($fileExtension == 'x') { ?>
+	<script src="<?php echo $this->url;?>/three/loaders/XLoader.js?v=<?php echo $settings->currentVersion;?>"></script>
+	<?php } ?>
+
 	<script src="<?php echo $this->url;?>/three/controls/OrbitControls.js?v=<?php echo $settings->currentVersion;?>"></script>
 	<script src="<?php echo $this->url;?>/app.js?v=<?php echo $settings->currentVersion;?>"></script>
 

@@ -56,6 +56,17 @@ var App = {
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 	},
 
+	onDownloadProgress: function(xhr) {
+		if (xhr.lengthComputable) {
+			var percentComplete = xhr.loaded / xhr.total * 100;
+			console.log('model ' + Math.round(percentComplete) + '% downloaded');
+		}
+	},
+
+	onLoadError: function() {
+		alert('failed to load model');
+	},
+
 	addObject: function(object) {
 		App.scene.add(object);
 		var box = new THREE.Box3().setFromObject(object);
@@ -81,6 +92,8 @@ var App = {
 			this.loadModelFBX();
 		} else if (this.vars.fileExtension == 'dae') {
 			this.loadModelDAE();
+		} else if (this.vars.fileExtension == 'x') {
+			this.loadModelX();
 		} else {
 			alert('This file format cannot be handled.');
 		}
@@ -99,18 +112,9 @@ var App = {
 		}
 		loader.load(
 			fileDownloadURL,
-			function(obj) {
-				App.addObject(obj);
-			},
-			function(xhr) {
-				if (xhr.lengthComputable) {
-					var percentComplete = xhr.loaded / xhr.total * 100;
-					console.log('model ' + Math.round(percentComplete) + '% downloaded');
-				}
-			},
-			function() {
-				alert('failed to load model');
-			}
+			function(obj) {App.addObject(obj);},
+			this.onDownloadProgress,
+			this.onLoadError
 		);
 	},
 
@@ -150,15 +154,8 @@ var App = {
 				mesh.receiveShadow = true;
 				App.addObject(mesh);
 			},
-			function(xhr) {
-				if (xhr.lengthComputable) {
-					var percentComplete = xhr.loaded / xhr.total * 100;
-					console.log('model ' + Math.round(percentComplete) + '% downloaded');
-				}
-			},
-			function() {
-				alert('failed to load model');
-			}
+			this.onDownloadProgress,
+			this.onLoadError
 		);
 	},
 
@@ -180,15 +177,8 @@ var App = {
 				});
 				App.addObject(obj);
 			},
-			function(xhr) {
-				if (xhr.lengthComputable) {
-					var percentComplete = xhr.loaded / xhr.total * 100;
-					console.log('model ' + Math.round(percentComplete) + '% downloaded');
-				}
-			},
-			function() {
-				alert('failed to load model');
-			}
+			this.onDownloadProgress,
+			this.onLoadError
 		);
 	},
 
@@ -198,18 +188,27 @@ var App = {
 		loader.setResourcePath(this.vars.downloadBaseURL+'&path='+this.vars.folderPath+'/');
 		loader.load(
 			fileDownloadURL,
-			function(obj) {
-				App.addObject(obj.scene);
-			},
-			function(xhr) {
-				if (xhr.lengthComputable) {
-					var percentComplete = xhr.loaded / xhr.total * 100;
-					console.log('model ' + Math.round(percentComplete) + '% downloaded');
+			function(obj) {App.addObject(obj.scene);},
+			this.onDownloadProgress,
+			this.onLoadError
+		);
+	},
+
+	loadModelX: function() {
+		var loader = new THREE.XLoader(this.loadingManager);
+		var fileDownloadURL = this.vars.downloadBaseURL+'&path='+encodeURIComponent(this.vars.filePath);
+		loader.setResourcePath(this.vars.downloadBaseURL+'&path='+this.vars.folderPath+'/');
+		loader.load(
+			[fileDownloadURL],
+			function(object) {
+				for (var i = 0; i < object.models.length; i++) {
+					var model = object.models[i];
+					model.scale.x *= -1;
+					App.addObject(model);
 				}
 			},
-			function() {
-				alert('failed to load model');
-			}
+			this.onDownloadProgress,
+			this.onLoadError
 		);
 	}
 
