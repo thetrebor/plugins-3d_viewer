@@ -1,5 +1,5 @@
 # FileRun Plugin: 3D Viewer
-FileRun plugin for viewing 3D files. Currently supported file types: OBJ/MTL, STL, FBX, DAE, X.
+FileRun plugin for viewing 3D files. Currently supported file types: OBJ/MTL, STL, FBX, DAE, X, GLTF/GLB and 3DS.
 # Installation
 - Copy the "3d_viewer" folder inside your FileRun installation folder's "customizables/plugins" folder.
 - You might need to clear your browser's cache to see the new "Open with.." option.
