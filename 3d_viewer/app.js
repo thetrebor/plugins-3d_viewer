@@ -1,13 +1,18 @@
 var App = {
+
+	loaderBar : null,
 	init: function() {
 		this.initRenderer();
 		this.initScene();
 		this.initCamera();
 		this.loadModel();
+		
 		window.addEventListener('resize', this.onWindowResize.bind(this));
 
 		this.clock = new THREE.Clock();
 		this.animate();
+
+		App.loaderBar = document.getElementById("loader-bar");
 	},
 
 	initRenderer: function() {
@@ -20,7 +25,7 @@ var App = {
 	},
 
 	initCamera: function() {
-		this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+		this.camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 1, 10000);
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 		this.controls.screenSpacePanning = true;
 
@@ -33,7 +38,7 @@ var App = {
 
 	initScene: function() {
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color(0xC0C0C0);
+		this.scene.background = new THREE.Color(0x303030);
 		this.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
 	},
 
@@ -60,6 +65,7 @@ var App = {
 		if (xhr.lengthComputable) {
 			var percentComplete = xhr.loaded / xhr.total * 100;
 			console.log('model ' + Math.round(percentComplete) + '% downloaded');
+			App.loaderBar.style.width = percentComplete + "%";
 		}
 	},
 
@@ -69,18 +75,41 @@ var App = {
 	},
 
 	addObject: function(object) {
+		
 		App.scene.add(object);
+
 		var box = new THREE.Box3().setFromObject(object);
-		var size = box.getSize(new THREE.Vector3()).length();
-		box.getCenter(this.controls.target);
-		this.controls.maxDistance = size * 5;
+
+		var _v = box.getSize(new THREE.Vector3());
+		var size = Math.max( _v.x, _v.y, _v.z );
+		var center = box.getCenter(this.controls.target);
+
+		//opposite over base, gives you the field of view, convert to degrees, and zoom out by a tiny bit
+		this.camera.fov = 1.1 * Math.tan( size / this.camera.position.z ) * 180/Math.PI;
+		this.camera.updateProjectionMatrix();
+
+		this.controls.maxDistance = this.camera.position.z * 3;
+		this.controls.minDistance = this.camera.position.z / 2;
 		this.controls.update();
+
+		this.dLight = new THREE.DirectionalLight( 0x5555EE, 0.6 );
+		this.scene.add( this.dLight );
+		this.dLight.position.set( 0,0.3,0.8 );
+		this.dLight.target = object;
+		
+
+		this.dLight.castShadow = true;
+		object.castShadow = true;
+
 	},
 
 	loadModel: function() {
+		
 		this.loadingManager = new THREE.LoadingManager();
-		this.loadingManager.onProgress = function (item, loaded, total) {
-			//console.log(item, loaded, total);
+		this.loadingManager.onLoad = function() {
+			//remove the loader when you're done;
+			App.loaderBar.parentNode.removeChild(App.loaderBar);
+			App.loaderBar = null;
 		};
 
 		if (this.vars.fileExtension == 'obj') {
@@ -145,7 +174,7 @@ var App = {
 		loader.load(
 			fileDownloadURL,
 			function(geometry) {
-				var materialProps = {color: 0x00AEEF, specular: 0x111111, shininess: 200};
+				var materialProps = {color: 0xBDBDBD, specular: 0x111111, shininess: 100};
 				if (geometry.hasColors ) {
 					materialProps.opacity = geometry.alpha;
 					materialProps.vertexColors = THREE.VertexColors;

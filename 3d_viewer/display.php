@@ -75,5 +75,8 @@ $vars = [
 </head>
 
 <body onload="App.init()">
+	<div id='loader' style='height:3px; width:100%; position: fixed; bottom: 0px; background-color:#f5f5f5;'>
+		<div id='loader-bar' style='height:3px; width: 0%; background-color:#337ab7; text-align: center;color:white;font-size:1em;'></div>
+	</div>
 </body>
 </html>
